@@ -34,19 +34,19 @@ function Navbar() {
       <div className="navbar-actions">
         <NavLink to="/login" className="nav-action">
           <FaRegUserCircle />
-          <span>{user ? user.name : 'Login'}</span>
+          <span className="nav-label">{user ? user.name : 'Login'}</span>
           <FaChevronDown size={10} />
         </NavLink>
 
         <span className="nav-action">
           <BsThreeDotsVertical />
-          <span>More</span>
+          <span className="nav-label">More</span>
           <FaChevronDown size={10} />
         </span>
 
         <NavLink to="/cart" className="nav-action">
           <FaShoppingCart />
-          <span>Cart</span>
+          <span className="nav-label">Cart</span>
           <span className="cart-pill">{cartCount}</span>
         </NavLink>
 

@@ -499,7 +499,7 @@ button,
     gap: 0.6rem;
   }
 
-  .nav-action span {
+  .nav-action .nav-label {
     display: none;
   }
 

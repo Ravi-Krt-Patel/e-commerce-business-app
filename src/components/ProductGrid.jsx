@@ -1,4 +1,5 @@
 import { useContext, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { ShopContext } from '../context/ShopContext'
 
 function ProductGrid() {
@@ -81,8 +82,10 @@ function ProductGrid() {
           key={product.id}
           className={`product-card ${activeProductId === product.id ? 'added-feedback' : ''}`}
         >
-          <img src={product.image} alt={product.name} />
-          <h4>{product.name}</h4>
+          <Link to={`/product/${product.id}`} className="product-link-wrap">
+            <img src={product.image} alt={product.name} />
+            <h4>{product.name}</h4>
+          </Link>
           <p className="meta">{product.category}</p>
           <p className="meta">Rating: {product.rating}</p>
           <div className="card-bottom">

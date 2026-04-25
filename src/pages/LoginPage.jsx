@@ -3,6 +3,67 @@ import { Formik, Form, Field, ErrorMessage } from 'formik'
 import * as Yup from 'yup'
 import { ShopContext } from '../context/ShopContext'
 
+const INDIA_STATES = [
+  'Andaman and Nicobar Islands',
+  'Andhra Pradesh',
+  'Arunachal Pradesh',
+  'Assam',
+  'Bihar',
+  'Chandigarh',
+  'Chhattisgarh',
+  'Dadra and Nagar Haveli and Daman and Diu',
+  'Delhi',
+  'Goa',
+  'Gujarat',
+  'Haryana',
+  'Himachal Pradesh',
+  'Jammu and Kashmir',
+  'Jharkhand',
+  'Karnataka',
+  'Kerala',
+  'Ladakh',
+  'Lakshadweep',
+  'Madhya Pradesh',
+  'Maharashtra',
+  'Manipur',
+  'Meghalaya',
+  'Mizoram',
+  'Nagaland',
+  'Odisha',
+  'Puducherry',
+  'Punjab',
+  'Rajasthan',
+  'Sikkim',
+  'Tamil Nadu',
+  'Telangana',
+  'Tripura',
+  'Uttar Pradesh',
+  'Uttarakhand',
+  'West Bengal',
+]
+
+const INDIA_CITIES_BY_STATE = {
+  Delhi: ['New Delhi', 'Delhi'],
+  Karnataka: ['Bengaluru', 'Mysuru', 'Mangaluru', 'Hubballi'],
+  Maharashtra: ['Mumbai', 'Pune', 'Nagpur', 'Nashik'],
+  'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai', 'Salem'],
+  Telangana: ['Hyderabad', 'Warangal', 'Nizamabad'],
+  Kerala: ['Kochi', 'Thiruvananthapuram', 'Kozhikode'],
+  Gujarat: ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot'],
+  Rajasthan: ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota'],
+  'Uttar Pradesh': ['Lucknow', 'Kanpur', 'Noida', 'Varanasi'],
+  'West Bengal': ['Kolkata', 'Howrah', 'Durgapur', 'Siliguri'],
+  Haryana: ['Gurugram', 'Faridabad', 'Panipat'],
+  Punjab: ['Ludhiana', 'Amritsar', 'Jalandhar', 'Patiala'],
+  'Madhya Pradesh': ['Bhopal', 'Indore', 'Jabalpur', 'Gwalior'],
+  'Andhra Pradesh': ['Visakhapatnam', 'Vijayawada', 'Guntur'],
+  Bihar: ['Patna', 'Gaya', 'Muzaffarpur'],
+  Odisha: ['Bhubaneswar', 'Cuttack', 'Rourkela'],
+  Assam: ['Guwahati', 'Dibrugarh', 'Silchar'],
+}
+
+const allKnownCities = Object.values(INDIA_CITIES_BY_STATE).flat()
+
 const profileSchema = Yup.object({
   firstName: Yup.string().trim().min(2, 'Enter at least 2 characters').required('First name is required'),
   lastName: Yup.string().trim().min(2, 'Enter at least 2 characters').required('Last name is required'),
@@ -13,8 +74,12 @@ const profileSchema = Yup.object({
     .required('Contact number is required'),
   image: Yup.string().trim().url('Enter a valid image URL').required('Profile image is required'),
   addressLine1: Yup.string().trim().min(8, 'Enter a full address').required('Address is required'),
-  city: Yup.string().trim().required('City is required'),
-  state: Yup.string().trim().required('State is required'),
+  state: Yup.string()
+    .oneOf(INDIA_STATES, 'Select a valid Indian state/UT')
+    .required('State is required'),
+  city: Yup.string()
+    .oneOf(allKnownCities, 'Select a valid city')
+    .required('City is required'),
   pincode: Yup.string()
     .trim()
     .matches(/^[0-9]{6}$/, 'Enter a valid 6-digit pincode')
@@ -95,7 +160,10 @@ function LoginPage() {
             setIsEditing(false)
           }}
         >
-          {({ isSubmitting }) => (
+          {({ isSubmitting, values, setFieldValue }) => {
+            const cityOptions = INDIA_CITIES_BY_STATE[values.state] || []
+
+            return (
             <Form className="login-form">
               <div className="form-grid">
                 <div className="form-field">
@@ -135,14 +203,50 @@ function LoginPage() {
                 </div>
                 <div className="form-grid">
                   <div className="form-field">
-                    <label htmlFor="city">City</label>
-                    <Field id="city" name="city" type="text" />
-                    <ErrorMessage name="city" component="p" className="form-error" />
+                    <label htmlFor="state">State (India)</label>
+                    <Field
+                      as="select"
+                      id="state"
+                      name="state"
+                      className="filter-select"
+                      onChange={(event) => {
+                        const nextState = event.target.value
+                        setFieldValue('state', nextState)
+                        setFieldValue('city', '')
+                      }}
+                    >
+                      <option value="">Select state</option>
+                      {INDIA_STATES.map((state) => (
+                        <option key={state} value={state}>
+                          {state}
+                        </option>
+                      ))}
+                    </Field>
+                    <ErrorMessage name="state" component="p" className="form-error" />
                   </div>
                   <div className="form-field">
-                    <label htmlFor="state">State</label>
-                    <Field id="state" name="state" type="text" />
-                    <ErrorMessage name="state" component="p" className="form-error" />
+                    <label htmlFor="city">City</label>
+                    <Field
+                      as="select"
+                      id="city"
+                      name="city"
+                      className="filter-select"
+                      disabled={!values.state || cityOptions.length === 0}
+                    >
+                      <option value="">
+                        {!values.state
+                          ? 'Select state first'
+                          : cityOptions.length === 0
+                            ? 'No cities available'
+                            : 'Select city'}
+                      </option>
+                      {cityOptions.map((city) => (
+                        <option key={city} value={city}>
+                          {city}
+                        </option>
+                      ))}
+                    </Field>
+                    <ErrorMessage name="city" component="p" className="form-error" />
                   </div>
                   <div className="form-field">
                     <label htmlFor="pincode">Pincode</label>
@@ -163,7 +267,7 @@ function LoginPage() {
                 ) : null}
               </div>
             </Form>
-          )}
+          )}}
         </Formik>
       )}
     </section>

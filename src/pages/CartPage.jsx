@@ -1,14 +1,22 @@
-import { useContext, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useContext, useEffect, useMemo, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ShopContext } from '../context/ShopContext'
 
 function CartPage() {
+  const navigate = useNavigate()
+  const location = useLocation()
   const { cart, addToCart, removeFromCart, cartTotal, user } = useContext(ShopContext)
   const [couponCode, setCouponCode] = useState('')
   const deliveryName = user ? `${user.firstName} ${user.lastName}`.trim() : 'Add profile'
   const deliveryAddress = user?.address
     ? `${user.address.line1}, ${user.address.city}, ${user.address.state} - ${user.address.pincode}`
     : 'Please add your delivery address'
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login', { replace: true, state: { from: location.pathname } })
+    }
+  }, [location.pathname, navigate, user])
 
   const subtotal = cartTotal
   const shippingCharge = subtotal > 0 ? 99 : 0

@@ -12,6 +12,7 @@ import { BsThreeDotsVertical } from 'react-icons/bs'
 function Navbar() {
   const { cartCount, user, logout, searchTerm, setSearchTerm } =
     useContext(ShopContext)
+  const userLabel = user ? `${user.firstName} ${user.lastName}`.trim() : 'Login'
 
   return (
     <header className="navbar">
@@ -34,7 +35,7 @@ function Navbar() {
       <div className="navbar-actions">
         <NavLink to="/login" className="nav-action">
           <FaRegUserCircle />
-          <span className="nav-label">{user ? user.name : 'Login'}</span>
+          <span className="nav-label">{userLabel}</span>
           <FaChevronDown size={10} />
         </NavLink>
 

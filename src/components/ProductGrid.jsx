@@ -1,6 +1,7 @@
 import { useContext, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ShopContext } from '../context/ShopContext'
+import StarRating from './StarRating'
 
 function ProductGrid() {
   const { filteredProducts, addToCart } = useContext(ShopContext)
@@ -87,7 +88,7 @@ function ProductGrid() {
             <h4>{product.name}</h4>
           </Link>
           <p className="meta">{product.category}</p>
-          <p className="meta">Rating: {product.rating}</p>
+          <StarRating rating={product.rating} className="card-rating" showValue={true} />
           <div className="card-bottom">
             <strong>${product.price}</strong>
             <button

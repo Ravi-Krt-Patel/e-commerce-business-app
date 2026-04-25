@@ -3,8 +3,12 @@ import { Link } from 'react-router-dom'
 import { ShopContext } from '../context/ShopContext'
 
 function CartPage() {
-  const { cart, addToCart, removeFromCart, cartTotal } = useContext(ShopContext)
+  const { cart, addToCart, removeFromCart, cartTotal, user } = useContext(ShopContext)
   const [couponCode, setCouponCode] = useState('')
+  const deliveryName = user ? `${user.firstName} ${user.lastName}`.trim() : 'Add profile'
+  const deliveryAddress = user?.address
+    ? `${user.address.line1}, ${user.address.city}, ${user.address.state} - ${user.address.pincode}`
+    : 'Please add your delivery address'
 
   const subtotal = cartTotal
   const shippingCharge = subtotal > 0 ? 99 : 0
@@ -35,11 +39,12 @@ function CartPage() {
             <article className="cart-address">
               <div>
                 <p className="muted-label">Deliver to</p>
-                <strong>Bangalore - 560068</strong>
+                <strong>{deliveryName}</strong>
+                <p className="address-text">{deliveryAddress}</p>
               </div>
-              <button type="button" className="address-change-btn">
+              <Link to="/login" className="checkout-link address-change-btn">
                 Change
-              </button>
+              </Link>
             </article>
 
             <article className="coupon-box">

@@ -6,19 +6,51 @@ export const ShopContext = createContext(null)
 export function ShopProvider({ children }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
+  const [selectedBrands, setSelectedBrands] = useState([])
+  const [minRating, setMinRating] = useState(0)
+  const [minPrice, setMinPrice] = useState(
+    Math.min(...products.map((product) => product.price)),
+  )
+  const [maxPrice, setMaxPrice] = useState(
+    Math.max(...products.map((product) => product.price)),
+  )
   const [cart, setCart] = useState([])
   const [user, setUser] = useState(null)
+  const brands = useMemo(
+    () => [...new Set(products.map((product) => product.brand).filter(Boolean))],
+    [],
+  )
+  const lowestPrice = useMemo(
+    () => Math.min(...products.map((product) => product.price)),
+    [],
+  )
+  const highestPrice = useMemo(
+    () => Math.max(...products.map((product) => product.price)),
+    [],
+  )
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const categoryMatch =
         selectedCategory === 'All' || product.category === selectedCategory
+      const brandMatch =
+        selectedBrands.length === 0 || selectedBrands.includes(product.brand)
       const searchMatch = product.name
         .toLowerCase()
         .includes(searchTerm.toLowerCase())
-      return categoryMatch && searchMatch
+      const ratingMatch = product.rating >= minRating
+      const priceMatch = product.price >= minPrice && product.price <= maxPrice
+      return categoryMatch && brandMatch && searchMatch && ratingMatch && priceMatch
     })
-  }, [searchTerm, selectedCategory])
+  }, [searchTerm, selectedCategory, selectedBrands, minRating, minPrice, maxPrice])
+
+  const resetFilters = () => {
+    setSelectedCategory('All')
+    setSelectedBrands([])
+    setMinRating(0)
+    setMinPrice(lowestPrice)
+    setMaxPrice(highestPrice)
+  }
 
   const addToCart = (product) => {
     setCart((current) => {
@@ -42,7 +74,8 @@ export function ShopProvider({ children }) {
     )
   }
 
-  const login = (name, email) => setUser({ name, email })
+  const login = (profile) => setUser(profile)
+  const updateUser = (profile) => setUser(profile)
   const logout = () => setUser(null)
   const clearCart = () => setCart([])
 
@@ -64,6 +97,18 @@ export function ShopProvider({ children }) {
         setSearchTerm,
         selectedCategory,
         setSelectedCategory,
+        selectedBrands,
+        setSelectedBrands,
+        minRating,
+        setMinRating,
+        minPrice,
+        setMinPrice,
+        maxPrice,
+        setMaxPrice,
+        lowestPrice,
+        highestPrice,
+        brands,
+        resetFilters,
         cart,
         addToCart,
         removeFromCart,
@@ -71,6 +116,7 @@ export function ShopProvider({ children }) {
         cartCount,
         user,
         login,
+        updateUser,
         logout,
         clearCart,
       }}

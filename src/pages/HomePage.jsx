@@ -1,4 +1,5 @@
 import { useContext } from 'react'
+import { Link } from 'react-router-dom'
 import Footer from '../components/Footer'
 import FilterSidebar from '../components/FilterSidebar'
 import HeroBanner from '../components/HeroBanner'
@@ -8,6 +9,7 @@ import { ShopContext } from '../context/ShopContext'
 
 function HomePage() {
   const { searchTerm, setSearchTerm, user } = useContext(ShopContext)
+  const fullName = user ? `${user.firstName} ${user.lastName}`.trim() : 'Guest'
 
   return (
     <>
@@ -21,8 +23,12 @@ function HomePage() {
         </div>
         <div className="user-info-card">
           <h3>User Info</h3>
-          <p>Name: {user?.name || 'Guest'}</p>
+          <p>Name: {fullName}</p>
+          <p>Email: {user?.email || 'Not added yet'}</p>
           <p>Status: {user ? 'Logged In' : 'Logged Out'}</p>
+          <Link to="/login" className="user-info-link">
+            {user ? 'Edit profile' : 'Add profile'}
+          </Link>
         </div>
       </section>
 
